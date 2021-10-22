@@ -1,0 +1,23 @@
+{
+  "name": "beaker-bookmarker",
+  "version": "0.0.0",
+  "author": {
+    "email": "nathanckim18@gmail.com",
+    "name": "Nathan Kim",
+    "url": "https://nathankim.name"
+  },
+  "license": "Hippocratic-2.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "html-to-json": "^0.6.0",
+    "vue": "^3.2.16"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^1.9.3",
+    "vite": "^2.6.4"
+  }
+}
