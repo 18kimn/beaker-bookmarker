@@ -1,6 +1,7 @@
 {
   "name": "beaker-bookmarker",
   "version": "0.0.0",
+  "type": "module",
   "author": {
     "email": "nathanckim18@gmail.com",
     "name": "Nathan Kim",
@@ -13,6 +14,8 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "html-to-json": "^0.6.0",
     "vue": "^3.2.16"
   },
