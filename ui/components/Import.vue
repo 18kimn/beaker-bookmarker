@@ -1,15 +1,32 @@
 <template>
-  <input type="file" ref="fileUploader" id="bookmarksfile" @change="updateFile" />
+  <div>
+    <div class="button" v-on:click="importClicked = true" v-if="!importClicked">import bookmarks</div>
+    <div v-else>
+      <input type="file" ref="fileUploader" id="bookmarksfile" @change="updateFile" />
+      <div
+        v-if="bookmarksImported"
+        class="button"
+        v-on:click="saveBookmarks"
+      >save imported bookmarks</div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, toRefs } from 'vue'
+const props = defineProps({
+  bookmarks: JSON,
+})
+const { bookmarks } = toRefs(props)
+const updatedBookmarks = ref(bookmarks.value)
+const importClicked = ref(false)
+const bookmarksImported = ref(false)
 const emit = defineEmits(['onUpdate'])
 const fileUploader = ref({})
 
 const HTMLparser = (prev, curr) => {
-
-  // in the received HTML, it is either
+  // recursive parser to import bookmarks taht are exported from chrome
+  // in that document, items are one of:
   //  dt: either a folder (dl and h3) container or a bookmark (a) container
   //  dl: list of items in a folder. Should be looped through\
   //  a: an actual bookmark! a base case for recursion
@@ -38,6 +55,7 @@ const HTMLparser = (prev, curr) => {
       return [...prev, ...recursed];
   }
 }
+
 function updateFile() {
   const file = fileUploader.value.files[0]
   const reader = new FileReader()
@@ -46,12 +64,42 @@ function updateFile() {
     const el = document.createElement('div')
     el.innerHTML = reader.result
     const bookmarkList = [...el.querySelector('dl').children]
-    const parsedBookmarks = bookmarkList.reduce(HTMLparser, [])
-    emit('onUpdate', { bookmarks: parsedBookmarks })
+    updatedBookmarks.value = {
+      ...bookmarks.value,
+      bookmarks: [...bookmarkList.reduce(HTMLparser, [])],
+    }
+    console.log(JSON.parse(JSON.stringify(updatedBookmarks.value)))
+    emit('onUpdate', updatedBookmarks.value)
+    bookmarksImported.value = true
   }
 }
 
+async function saveBookmarks() {
+  console.log(JSON.parse(JSON.stringify(updatedBookmarks.value)))
+  await fetch('http://localhost:3200/', {
+    method: 'post',
+    body: JSON.stringify(updatedBookmarks.value),
+    headers: { "Content-Type": "application/json" }
+  }
+  )
+
+  console.log('data written!')
+}
+
+
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
+.button {
+  margin: 0.2rem;
+  padding: 0.5rem;
+  border: black solid 1px;
+  width: fit-content;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: black;
+  color: white;
+}
 </style>
