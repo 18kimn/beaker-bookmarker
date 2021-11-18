@@ -1,14 +1,11 @@
 <template>
-  <div>
-    <div class="button" v-on:click="importClicked = true" v-if="!importClicked">import bookmarks</div>
-    <div v-else>
+  <div class="container">
+    <label class="button" for="bookmarksfile">
+      import bookmarks
       <input type="file" ref="fileUploader" id="bookmarksfile" @change="updateFile" />
-      <div
-        v-if="bookmarksImported"
-        class="button"
-        v-on:click="saveBookmarks"
-      >save imported bookmarks</div>
-    </div>
+    </label>
+
+    <div v-if="bookmarksImported" class="button" v-on:click="saveBookmarks">save imported bookmarks</div>
   </div>
 </template>
 
@@ -19,7 +16,6 @@ const props = defineProps({
 })
 const { bookmarks } = toRefs(props)
 const updatedBookmarks = ref(bookmarks.value)
-const importClicked = ref(false)
 const bookmarksImported = ref(false)
 const emit = defineEmits(['onUpdate'])
 const fileUploader = ref({})
@@ -81,7 +77,7 @@ async function saveBookmarks() {
     body: JSON.stringify(updatedBookmarks.value),
     headers: { "Content-Type": "application/json" }
   }
-  )
+  ).catch(err => err)
 
   console.log('data written!')
 }
@@ -90,15 +86,32 @@ async function saveBookmarks() {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+}
+
 .button {
   margin: 0.2rem;
   padding: 0.5rem;
-  border: black solid 1px;
+  border: #93a1a1 solid 1px;
   width: fit-content;
   cursor: pointer;
+  background: white;
 }
 
-.button:hover {
+/* 
+hide the ugly file input button,
+but keep it screen-readable and selectable with focus-within
+*/
+
+#bookmarksfile {
+  opacity: 0;
+  width: 0;
+}
+.button:hover,
+.button:focus-within {
   background: black;
   color: white;
 }

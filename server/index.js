@@ -10,7 +10,7 @@ const app = express()
 app.use(cors())
 app.use(express.json({limit: '50mb'}))
 const bookmarks = await fs.readFile(
-  resolve(__dirname, 'bookmarks.json'),
+  resolve(__dirname, '../dist/bookmarks.json'),
   'utf-8',
 )
 app.get('/', (_, res) => {
@@ -22,7 +22,7 @@ app.post('/', async (req, res) => {
   const bookmarks = req.body
   console.log(bookmarks)
   await fs.writeFile(
-    resolve(__dirname, 'bookmarks.json'),
+    resolve(__dirname, '../dist/bookmarks.json'),
     JSON.stringify(bookmarks),
   )
   res.end()

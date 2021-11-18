@@ -9,9 +9,10 @@
   },
   "license": "Hippocratic-2.1",
   "scripts": {
-    "server": "nodemon server/index.js --exec babel-node --presets babel-preset-env",
+    "server": "yarn build && nodemon server/index.js --exec babel-node --presets babel-preset-env",
     "ui": "vite",
-    "start": "yarn server & yarn ui"
+    "start": "yarn server & yarn ui",
+    "build": "vite build"
   },
   "dependencies": {
     "@meltwater/fetch-favicon": "^1.0.4",
