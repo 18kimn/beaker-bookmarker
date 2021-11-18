@@ -1,6 +1,7 @@
 # beaker-bookmarker
 
-[Hyperdrive link](hyper://ae6de4cd35177fdd8555e2c9e7089afd22ee9a2d2db28afedca15965eda9aed4/) (must be accessed by DAT-supporting browser)
+Hyperdrive link (must be accessed by DAT-supporting browser)
+hyper://ae6de4cd35177fdd8555e2c9e7089afd22ee9a2d2db28afedca15965eda9aed4/
 
 ### Intro
 
