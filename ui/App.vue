@@ -10,7 +10,6 @@ import { ref, onMounted } from 'vue'
 // this file serves as the "source of truth" for bookmarks
 // all child components mutate this object
 
-
 const bookmarks = ref({ bookmarks: {} })
 
 /* 
@@ -33,10 +32,11 @@ const onKeyDown = ({ code }) => {
   items[toIndex]?.focus()
 }
 
+const PORT = import.meta.env.VITE_PORT
 onMounted(async () => {
   console.log(import.meta.env)
   const predefinedBookmarks = await fetch('/bookmarks.json').then(res => res.json())
-  const actualBookmarks = await fetch('http://localhost:3200/')
+  const actualBookmarks = await fetch(`http://localhost:${PORT}/`)
     .then(res => res.json())
     .then(test => {
       console.log(test)
@@ -52,7 +52,7 @@ onMounted(async () => {
 const updateBookmarks = async (newBookmarks) => {
   console.log('updateBookmarks called with', newBookmarks)
   bookmarks.value = newBookmarks
-  await fetch('http://localhost:3200/', {
+  await fetch(`http://localhost:${PORT}/`, {
     method: 'post',
     body: JSON.stringify(newBookmarks),
     headers: { "Content-Type": "application/json" }

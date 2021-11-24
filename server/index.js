@@ -3,6 +3,9 @@ import cors from 'cors'
 import {promises as fs} from 'fs'
 import {fileURLToPath} from 'url'
 import {resolve, dirname} from 'path'
+import {config} from 'dotenv'
+import fetchFavicon from './fetchFavicon.js'
+config()
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -20,15 +23,24 @@ app.get('/', (_, res) => {
 
 app.post('/', async (req, res) => {
   const bookmarks = req.body
-  console.log(bookmarks)
   await fs.writeFile(
     resolve(__dirname, '../dist/bookmarks.json'),
+    JSON.stringify(bookmarks),
+  )
+  await fs.writeFile(
+    resolve(__dirname, '../public/bookmarks.json'),
     JSON.stringify(bookmarks),
   )
   res.end()
 })
 
-const port = 3200
+app.get('/icon', async (req, res) => {
+  const domain = req.query.domain
+  const base64String = await fetchFavicon(domain)
+  res.send(base64String)
+})
+
+const port = process.env.VITE_PORT
 app.listen(port, () => {
   console.log(`beaker-bookmarker listening at http://localhost:${port}`)
 })

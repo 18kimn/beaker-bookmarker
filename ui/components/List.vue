@@ -21,15 +21,15 @@ infinite amount of nested bookmark folders -->
           @click="toggleShow"
         >
           <div class="textContainer">
-            <div v-if="isFolder">{{ filename }}</div>
+            <div v-if="isFolder">{{ currentBookmarkName }}</div>
             <div style="display: flex; align-items: center;" v-else>
               <img
                 v-bind:src="nextLevel.icon ||
                 'http://s2.googleusercontent.com/s2/favicons?domain_url=' + nextLevel.href"
-                v-bind:alt="`icon for ${filename}`"
+                v-bind:alt="`icon for ${currentBookmarkName}`"
                 style="margin: 0 7px;"
               />
-              <a class="link" v-bind:href="nextLevel.href" target="__blank">{{ filename }}</a>
+              <a class="link" v-bind:href="nextLevel.href" target="__blank">{{ currentBookmarkName }}</a>
             </div>
           </div>
         </button>
@@ -45,8 +45,8 @@ infinite amount of nested bookmark folders -->
         <div v-if="isAddHover" class="add" @click="isInputting = false">x</div>
         <div class="item" @click="addBookmark">add</div>
         <div class="inputs">
-          <input v-model="link" placeholder="Link" />
-          <input v-model="name" placeholder="Name" />
+          <input v-model="newBookmarkLink" placeholder="Link" />
+          <input v-model="newBookmarkName" placeholder="Name" />
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update'])
 const { bookmarks, isRoot, tabs } = toRefs(props)
-const filename = computed(() => Object.keys(bookmarks.value)[0])
+const currentBookmarkName = computed(() => Object.keys(bookmarks.value)[0])
 const nextLevel = computed(() => Object.values(bookmarks.value)[0])
 // if this item contains other things,
 //  i.e. if the next level after this is an array,
@@ -90,8 +90,8 @@ const shouldShow = ref(isRoot.value)
 const isHover = ref(false)
 const isAddHover = ref(false)
 const isInputting = ref(false)
-const link = ref('')
-const name = ref('')
+const newBookmarkLink = ref('')
+const newBookmarkName = ref('')
 const toggleShow = () => {
   shouldShow.value = !shouldShow.value
 }
@@ -114,22 +114,42 @@ const toggleShow = () => {
 //   send it back up the tree. 
 
 const addBookmark = async () => {
-  const key = Object.keys(bookmarks.value)[0]
-  const value = Object.values(bookmarks.value)[0]
-  const newBookmarks = link.value ? {
-    [key]: [...value, { [name.value]: { href: link.value } }]
-  } : {
-    [key]: [...value, { [name.value]: [] }]
+  const currentBookmarks = Object.values(bookmarks.value)[0]
+
+  // if a link was given, it's a bookmark 
+  //  which is an object with structure {href: __, icon: __}
+  // if a link wasn't given, it's the creation of a new folder 
+  //  which is an empty array
+  const port = import.meta.env.VITE_PORT
+  const newEntry = newBookmarkLink.value ? 
+  {href: newBookmarkLink.value,
+  icon: await fetch(
+    `http://localhost:${port}/icon?domain=${newBookmarkLink.value}`
+  ).then(res => res.text())
+  } :
+  []
+
+  // append our new entry to 
+  // the previous existing entries on the current level 
+  const newBookmarks = {
+    [currentBookmarkName.value]: [...currentBookmarks, 
+    { [newBookmarkName.value]: newEntry}
+    ]
   }
 
+  // then send it 'up' so that the root data structure can know about this
   emit('update', newBookmarks)
+
+  // finally set some state manually to hide the "add bookmark" menu
   isInputting.value = false
   shouldShow.value = true
 }
 
+// to delete a bookmark, we can just make it into an empty array
 const deleteBookmark = () => {
-  emit('update', { [filename.value]: {} })
+  emit('update', { [currentBookmarkName.value]: {} })
 }
+
 const updater = (updatedBookmark) => {
 
   // if the item to update already exists, replace it instead of updating
@@ -148,7 +168,7 @@ const updater = (updatedBookmark) => {
     }
   }, [])
 
-  emit('update', { [filename.value]: newBookmarks })
+  emit('update', { [currentBookmarkName.value]: newBookmarks })
 }
 </script>
 

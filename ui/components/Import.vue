@@ -72,7 +72,7 @@ function updateFile() {
 
 async function saveBookmarks() {
   console.log(JSON.parse(JSON.stringify(updatedBookmarks.value)))
-  await fetch('http://localhost:3200/', {
+  await fetch(`http://localhost:${import.meta.env.PORT}/`, {
     method: 'post',
     body: JSON.stringify(updatedBookmarks.value),
     headers: { "Content-Type": "application/json" }
