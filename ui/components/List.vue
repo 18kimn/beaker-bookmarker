@@ -24,12 +24,12 @@ infinite amount of nested bookmark folders -->
             <div v-if="isFolder">{{ currentBookmarkName }}</div>
             <div style="display: flex; align-items: center;" v-else>
               <img
-                v-bind:src="nextLevel.icon ||
-                'http://s2.googleusercontent.com/s2/favicons?domain_url=' + nextLevel.href"
+                v-bind:src="currentEntries.icon ||
+                'http://s2.googleusercontent.com/s2/favicons?domain_url=' + currentEntries.href"
                 v-bind:alt="`icon for ${currentBookmarkName}`"
                 style="margin: 0 7px;"
               />
-              <a class="link" v-bind:href="nextLevel.href" target="__blank">{{ currentBookmarkName }}</a>
+              <a class="link" v-bind:href="currentEntries.href" target="__blank">{{ currentBookmarkName }}</a>
             </div>
           </div>
         </button>
@@ -52,7 +52,7 @@ infinite amount of nested bookmark folders -->
     </div>
     <List
       v-if="isFolder && shouldShow"
-      v-for="item in nextLevel"
+      v-for="item in currentEntries"
       :isRoot="false"
       :bookmarks="item"
       :tabs="tabs + 2"
@@ -80,11 +80,11 @@ const props = defineProps({
 const emit = defineEmits(['update'])
 const { bookmarks, isRoot, tabs } = toRefs(props)
 const currentBookmarkName = computed(() => Object.keys(bookmarks.value)[0])
-const nextLevel = computed(() => Object.values(bookmarks.value)[0])
+const currentEntries = computed(() => Object.values(bookmarks.value)[0])
 // if this item contains other things,
 //  i.e. if the next level after this is an array,
 //  the current item is a folder
-const isFolder = computed(() => Array.isArray(nextLevel.value))
+const isFolder = computed(() => Array.isArray(currentEntries.value))
 
 const shouldShow = ref(isRoot.value)
 const isHover = ref(false)
@@ -114,7 +114,6 @@ const toggleShow = () => {
 //   send it back up the tree. 
 
 const addBookmark = async () => {
-  const currentBookmarks = Object.values(bookmarks.value)[0]
 
   // if a link was given, it's a bookmark 
   //  which is an object with structure {href: __, icon: __}
@@ -132,7 +131,7 @@ const addBookmark = async () => {
   // append our new entry to 
   // the previous existing entries on the current level 
   const newBookmarks = {
-    [currentBookmarkName.value]: [...currentBookmarks, 
+    [currentBookmarkName.value]: [...currentEntries.value, 
     { [newBookmarkName.value]: newEntry}
     ]
   }
@@ -157,7 +156,7 @@ const updater = (updatedBookmark) => {
   const key = Object.keys(updatedBookmark)[0]
   const value = updatedBookmark[key]
   console.log({ key, value })
-  const newBookmarks = nextLevel.value.reduce((prev, currentFolder) => {
+  const newBookmarks = currentEntries.value.reduce((prev, currentFolder) => {
 
     if (Object.keys(currentFolder)[0] !== key) {
       return [...prev, currentFolder] // unchanged case
