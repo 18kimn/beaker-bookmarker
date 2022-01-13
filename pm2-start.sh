@@ -1,3 +1,3 @@
 #!/bin/env sh
 
-yarn server
+yarn start
