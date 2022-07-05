@@ -15,12 +15,12 @@ use std::fs::{read_to_string, write};
 mod cors;
 mod favicon;
 
-#[get("/")]
+#[get("/bookmarks")]
 fn send_bookmarks() -> std::io::Result<String> {
-    read_to_string("bookmarks.json")
+    read_to_string("./build/bookmarks.json")
 }
 
-#[post("/", data = "<bookmarks>")]
+#[post("/bookmarks", data = "<bookmarks>")]
 fn update_bookmarks(bookmarks: &str) -> std::io::Result<()> {
     write("./build/bookmarks.json", bookmarks)?;
     write("../public/bookmarks.json", bookmarks)?;
@@ -41,12 +41,13 @@ async fn rocket() -> _ {
         .unwrap()
         .display()
         .to_string();
+    println!("{}", &root);
     env::set_current_dir(root).unwrap();
     dotenv().ok();
 
     let config = Config {
         port: var("VITE_PORT").unwrap().parse().unwrap(),
-        // log_level: LogLevel::Off,
+        log_level: LogLevel::Debug,
         ..Config::default()
     };
 

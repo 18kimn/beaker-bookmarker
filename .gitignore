@@ -1,7 +1,7 @@
-node_modules
+/node_modules/
+/dist/
+/.vscode/
 .DS_Store
-dist
-dist-ssr
-public/bookmarks.json
-*.local
-chrome-bookmarks.html
+.pnpm-debug.log
+
+bookmarks.json
